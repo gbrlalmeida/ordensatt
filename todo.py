@@ -9,89 +9,9 @@ class ToDo:
         self.page.window_resizable = False
         self.page.bgcolor = ft.colors.WHITE
         self.page.title = 'Ordens'
-        self.db_config = {
-            'dbname': 'servicos',
-            'user': 'GABRIEL',
-            'password': '123456',
-            'host': '192.168.10.52',
-            'port': '5432'
-        }
+        self.db_config = {}
         self.current_user = None
-        self.show_login_page()
-
-    def show_login_page(self):
-        logo = ft.Image(src="img/grupoatt-1-Photoroom.png", width=170, height=170)
-
-        self.username = ft.TextField(
-            label="Usuário", 
-            width=300,
-            color=ft.colors.BLACK,
-            border=ft.InputBorder.OUTLINE,
-            border_radius=10,
-        )
-        self.password = ft.TextField(
-            label="Senha", 
-            width=300, 
-            password=True, 
-            can_reveal_password=True,
-            color=ft.colors.BLACK,
-            border=ft.InputBorder.OUTLINE,
-            border_radius=10,
-        )
-        login_button = ft.ElevatedButton(
-            text="Login", 
-            on_click=self.login,
-            style=ft.ButtonStyle(
-                elevation=2
-            )
-        )
-
-        self.error_message = ft.Text("", color=ft.colors.RED)
-
-        login_form = ft.Column(
-            controls=[
-                logo,
-                self.username,
-                self.password,
-                login_button,
-                self.error_message,
-            ],
-            alignment=ft.MainAxisAlignment.CENTER,
-            horizontal_alignment=ft.CrossAxisAlignment.CENTER
-        )
-
-        centered_container = ft.Container(
-            content=login_form,
-            alignment=ft.alignment.center,
-            expand=True,
-        )
-
-        self.page.add(centered_container)
-        self.login_form = centered_container
-
-    def login(self, e):
-        user = self.authenticate_user(self.username.value, self.password.value)
-        if user:
-            self.current_user = user[0]
-            self.page.remove(self.login_form)
-            self.main_page()
-        else:
-            self.error_message.value = "Usuário ou senha inválidos"
-            self.password.value = ""
-            self.page.update()
-
-    def authenticate_user(self, username, password):
-        try:
-            conn = psycopg2.connect(**self.db_config)
-            cursor = conn.cursor()
-            cursor.execute("SELECT id_usuario FROM usuarios WHERE id_usuario = %s AND senha = %s", (username, password))
-            user = cursor.fetchone()
-            cursor.close()
-            conn.close()
-            return user
-        except Exception as e:
-            print(f"Erro ao conectar ao banco de dados: {e}")
-            return None
+        self.main_page()
 
     def main_page(self):
         self.menu_open = False
@@ -111,7 +31,7 @@ class ToDo:
                     )
                 )
             ],
-            alignment=ft.MainAxisAlignment.START,
+            alignment=ft.MainAxisAlignment.CENTER,
             spacing=4
         )
 
@@ -126,11 +46,10 @@ class ToDo:
                     )
                 )
             ],
-            alignment=ft.MainAxisAlignment.START,
+            alignment=ft.MainAxisAlignment.CENTER,
             spacing=4
         )
 
-        # Container for menu items with centered alignment
         menu_items_container = ft.Column(
             controls=[
                 add_order_item,
@@ -142,50 +61,11 @@ class ToDo:
             expand=True
         )
 
-        # Centering menu content
         self.menu_content = ft.Column(
             controls=[
-                # Container for the logo, username, and back arrow
                 ft.Container(
                     content=ft.Column(
                         controls=[
-                            ft.Container(
-                                content=ft.Row(
-                                    controls=[
-                                        ft.Container(width=0, expand=True),
-                                        ft.IconButton(
-                                            icon=ft.icons.ARROW_BACK,
-                                            on_click=self.toggle_menu,
-                                            style=ft.ButtonStyle(
-                                                shape=ft.RoundedRectangleBorder(radius=8),
-                                                bgcolor=ft.colors.TRANSPARENT,
-                                                color=ft.colors.BLACK
-                                            )
-                                        )
-                                    ],
-                                    alignment=ft.MainAxisAlignment.END,
-                                ),
-                                padding=ft.Padding(10, 10, 10, 10),
-                            ),
-                            ft.Container(
-                                content=ft.Column(
-                                    controls=[
-                                        ft.CircleAvatar(
-                                            content=ft.Image(src="img/foto_usuario.png", fit=ft.ImageFit.COVER),
-                                            radius=30,
-                                        ),
-                                        ft.Text(
-                                            self.current_user,
-                                            size=18,
-                                            weight=ft.FontWeight.BOLD,
-                                            color=ft.colors.BLACK
-                                        )
-                                    ],
-                                    alignment=ft.MainAxisAlignment.CENTER
-                                ),
-                                padding=ft.Padding(20, 0, 20, 0),
-                                alignment=ft.alignment.center
-                            ),
                             ft.Container(height=20),
                         ],
                         alignment=ft.MainAxisAlignment.CENTER,
@@ -193,13 +73,11 @@ class ToDo:
                     padding=ft.Padding(20, 0, 20, 0),
                     alignment=ft.alignment.center,
                 ),
-                # Menu items container
                 ft.Container(
                     content=menu_items_container,
                     alignment=ft.alignment.center,
                     expand=True
                 ),
-                # Spacer to push the "Logout" button to the bottom
                 ft.Container(expand=True),
                 ft.Row(
                     controls=[
@@ -316,30 +194,12 @@ class ToDo:
         )
 
     def get_orders_by_status(self, status):
-        try:
-            conn = psycopg2.connect(**self.db_config)
-            cursor = conn.cursor()
-            cursor.execute("SELECT id_ordem FROM ordens WHERE status = %s", (status,))
-            orders = cursor.fetchall()
-            cursor.close()
-            conn.close()
-            return orders
-        except Exception as e:
-            print(f"Erro ao conectar ao banco de dados: {e}")
-            return []
+        # Placeholder for database interaction
+        return []
 
     def get_order_by_id(self, order_id):
-        try:
-            conn = psycopg2.connect(**self.db_config)
-            cursor = conn.cursor()
-            cursor.execute("SELECT * FROM ordens WHERE id_ordem = %s", (order_id,))
-            order = cursor.fetchall()
-            cursor.close()
-            conn.close()
-            return order
-        except Exception as e:
-            print(f"Erro ao conectar ao banco de dados: {e}")
-            return []
+        # Placeholder for database interaction
+        return []
 
     def view_order_details(self, e):
         print("Ordem detalhada")
@@ -355,29 +215,101 @@ class ToDo:
         ongoing_orders = len(self.get_orders_by_status('Em andamento'))
         completed_orders = len(self.get_orders_by_status('Finalizado'))
 
+        async def on_chart_event(e: ft.PieChartEvent):
+            for idx, section in enumerate(chart.sections):
+                if idx == e.section_index:
+                    section.radius = hover_radius
+                    section.title_style = hover_title_style
+                else:
+                    section.radius = normal_radius
+                    section.title_style = normal_title_style
+            await chart.update_async()
+
+        normal_radius = 50
+        hover_radius = 60
+        normal_title_style = ft.TextStyle(
+            size=16, color=ft.colors.WHITE, weight=ft.FontWeight.BOLD
+        )
+        hover_title_style = ft.TextStyle(
+            size=22,
+            color=ft.colors.WHITE,
+            weight=ft.FontWeight.BOLD,
+            shadow=ft.BoxShadow(blur_radius=2, color=ft.colors.BLACK54),
+        )
+
+        chart = ft.PieChart(
+            sections=[
+                ft.PieChartSection(
+                    40,
+                    title="40%",
+                    title_style=normal_title_style,
+                    color=ft.colors.BLUE,
+                    radius=normal_radius,
+                ),
+                ft.PieChartSection(
+                    30,
+                    title="30%",
+                    title_style=normal_title_style,
+                    color=ft.colors.YELLOW,
+                    radius=normal_radius,
+                ),
+                ft.PieChartSection(
+                    15,
+                    title="15%",
+                    title_style=normal_title_style,
+                    color=ft.colors.PURPLE,
+                    radius=normal_radius,
+                ),
+                ft.PieChartSection(
+                    15,
+                    title="15%",
+                    title_style=normal_title_style,
+                    color=ft.colors.GREEN,
+                    radius=normal_radius,
+                ),
+            ],
+            sections_space=0,
+            center_space_radius=40,
+            on_chart_event=on_chart_event,
+            expand=True,
+        )
+
         analysis_page = ft.Column(
             controls=[
                 ft.Row(
                     controls=[
-                        ft.Text("Dash", size=28, weight=ft.FontWeight.BOLD, color=ft.colors.BLACK),
-                        ft.Text("Ordens", size=28, weight=ft.FontWeight.BOLD, color=ft.colors.BLUE_900)
+                        ft.IconButton(
+                            icon=ft.icons.ARROW_BACK,
+                            icon_size=30,
+                            on_click=self.go_back_to_main_page
+                        ),
+                        ft.Text("Análises", size=28, weight=ft.FontWeight.BOLD, color=ft.colors.BLACK),
                     ],
-                    alignment=ft.MainAxisAlignment.CENTER
+                    alignment=ft.MainAxisAlignment.CENTER,
+                    spacing=10,
+                    height=50,
+                    vertical_alignment=ft.CrossAxisAlignment.CENTER
                 ),
                 ft.Container(
                     content=ft.Column(
                         controls=[
                             ft.Row(
                                 controls=[
-                                    ft.Text("Número de ordens pendentes", size=16, weight=ft.FontWeight.BOLD, color=ft.colors.BLACK),
+                                    ft.Text("Ordens Pendentes", size=16, weight=ft.FontWeight.BOLD, color=ft.colors.BLACK),
                                     ft.Text(f"{pending_orders}", size=16, weight=ft.FontWeight.BOLD, color=ft.colors.BLUE_900)
                                 ],
                                 alignment=ft.MainAxisAlignment.START,
                                 spacing=10
                             ),
+                            ft.Container(
+                                content=chart,
+                                height=200,  # Adjust the height as needed
+                                padding=ft.Padding(20, 0, 20, 0),
+                                alignment=ft.alignment.center
+                            ),
                             ft.Row(
                                 controls=[
-                                    ft.Text("Número de ordens em andamento", size=16, weight=ft.FontWeight.BOLD, color=ft.colors.BLACK),
+                                    ft.Text("Ordens em Andamento", size=16, weight=ft.FontWeight.BOLD, color=ft.colors.BLACK),
                                     ft.Text(f"{ongoing_orders}", size=16, weight=ft.FontWeight.BOLD, color=ft.colors.BLUE_900)
                                 ],
                                 alignment=ft.MainAxisAlignment.START,
@@ -385,12 +317,13 @@ class ToDo:
                             ),
                             ft.Row(
                                 controls=[
-                                    ft.Text("Número de ordens finalizadas", size=16, weight=ft.FontWeight.BOLD, color=ft.colors.BLACK),
+                                    ft.Text("Ordens Finalizadas", size=16, weight=ft.FontWeight.BOLD, color=ft.colors.BLACK),
                                     ft.Text(f"{completed_orders}", size=16, weight=ft.FontWeight.BOLD, color=ft.colors.BLUE_900)
                                 ],
                                 alignment=ft.MainAxisAlignment.START,
                                 spacing=10
                             ),
+
                         ],
                         alignment=ft.MainAxisAlignment.CENTER,
                         horizontal_alignment=ft.CrossAxisAlignment.CENTER,
@@ -399,17 +332,13 @@ class ToDo:
                     padding=ft.Padding(20, 20, 20, 20),
                     alignment=ft.alignment.center
                 ),
-                ft.ElevatedButton(text="Voltar", on_click=self.go_back_to_main_page)
             ],
             alignment=ft.MainAxisAlignment.CENTER,
             horizontal_alignment=ft.CrossAxisAlignment.CENTER,
             spacing=20
         )
 
-        # Remove the main page content
         self.page.controls.clear()
-        
-        # Add the analysis page content
         self.page.add(analysis_page)
         self.page.update()
 
@@ -419,9 +348,10 @@ class ToDo:
 
     def logout(self, e):
         self.page.remove(self.page.controls[0])
-        self.show_login_page()
+        self.main_page()
 
 def main(page: ft.Page):
     ToDo(page)
 
 ft.app(target=main)
+
